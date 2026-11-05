@@ -45,7 +45,7 @@ def analyze_temporal(df: pd.DataFrame) -> dict[str, Any]:
 
     # Day of week breakdown (0=Monday, 6=Sunday)
     day_names = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-    dow_counts = valid_dt.dt.dayofweek.value_counts().sort_index().to_dict()
+    dow_counts = valid_dt.dt.day_of_week.value_counts().sort_index().to_dict()
     dow_dict = {day_names[k]: int(dow_counts.get(k, 0)) for k in range(7)}
 
     # Hour of day breakdown (UTC)

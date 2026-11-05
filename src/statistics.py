@@ -74,23 +74,27 @@ def calculate_descriptive_statistics(df: pd.DataFrame) -> dict[str, Any]:
             "gini_coefficient": round(compute_gini(series.to_numpy()), 4),
         }
 
-    # Extract Top 5 engaged comments
+    # Extract Top 5 engaged comments safely
+    avail_liked_cols = [c for c in ["author", "likes", "reply_count", "published_at", "comment"] if c in df.columns]
     top_liked = (
         df.sort_values(by="likes", ascending=False)
-        .head(5)[["author", "likes", "reply_count", "published_at", "comment"]]
+        .head(5)[avail_liked_cols]
         .to_dict(orient="records")
-    )
+    ) if "likes" in df.columns and avail_liked_cols else []
     for record in top_liked:
         # truncate text to 150 chars for summary readability
-        record["comment_preview"] = str(record["comment"])[:150]
+        if "comment" in record:
+            record["comment_preview"] = str(record["comment"])[:150]
 
+    avail_replied_cols = [c for c in ["author", "reply_count", "likes", "published_at", "comment"] if c in df.columns]
     top_replied = (
         df.sort_values(by="reply_count", ascending=False)
-        .head(5)[["author", "reply_count", "likes", "published_at", "comment"]]
+        .head(5)[avail_replied_cols]
         .to_dict(orient="records")
-    )
+    ) if "reply_count" in df.columns and avail_replied_cols else []
     for record in top_replied:
-        record["comment_preview"] = str(record["comment"])[:150]
+        if "comment" in record:
+            record["comment_preview"] = str(record["comment"])[:150]
 
     stats_result["top_5_liked_comments"] = top_liked
     stats_result["top_5_replied_comments"] = top_replied
